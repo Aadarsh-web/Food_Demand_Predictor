@@ -1,0 +1,26 @@
+menu,ingredient,quantity_per_100
+Chicken Rice,Rice,7.5
+Chicken Rice,Chicken,4.5
+Chicken Rice,Onion,1.5
+Chicken Rice,Tomato,1.2
+Chicken Rice,Oil,0.8
+Dal Rice,Rice,7.5
+Dal Rice,Dal,2.5
+Dal Rice,Onion,1.2
+Dal Rice,Tomato,1.0
+Dal Rice,Oil,0.7
+Egg Curry Rice,Rice,7.5
+Egg Curry Rice,Eggs,100
+Egg Curry Rice,Onion,1.5
+Egg Curry Rice,Tomato,1.2
+Egg Curry Rice,Oil,0.8
+Paneer Rice,Rice,7.5
+Paneer Rice,Paneer,4.5
+Paneer Rice,Onion,1.5
+Paneer Rice,Tomato,1.2
+Paneer Rice,Oil,0.8
+Rajma Rice,Rice,7.5
+Rajma Rice,Rajma,2.8
+Rajma Rice,Onion,1.2
+Rajma Rice,Tomato,1.0
+Rajma Rice,Oil,0.7

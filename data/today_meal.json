@@ -1,0 +1,17 @@
+{
+    "attendance": 600,
+    "meal_type": "Lunch",
+    "menu": "Chicken Rice",
+    "rain": 1,
+    "temperature": 28,
+    "holiday": 0,
+    "exam": 0,
+    "campus_event": 0,
+    "previous_consumption": 570,
+    "previous_surplus": 30,
+    "day_of_week": 2,
+    "actual_consumed": 555,
+    "storage_temperature": 68,
+    "storage_type": "hot",
+    "location": "Bhubaneswar"
+}
