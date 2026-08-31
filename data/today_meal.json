@@ -1,7 +1,7 @@
 {
     "attendance": 600,
     "meal_type": "Lunch",
-    "menu": "Chicken Rice",
+    "menu": "Chole",
     "rain": 1,
     "temperature": 28,
     "holiday": 0,
@@ -13,5 +13,10 @@
     "actual_consumed": 555,
     "storage_temperature": 68,
     "storage_type": "hot",
+    "storage_duration_hours": 1,
+    "hostel_latitude": 20.293,
+    "hostel_longitude": 85.825,
+    "month": 8,
+    "season": "Monsoon",
     "location": "Bhubaneswar"
 }

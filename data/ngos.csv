@@ -1,5 +1,5 @@
-ngo_name,location,food_types,max_servings,pickup_available
-Hope Foundation,Bhubaneswar,Chicken Rice,50,1
-Annapurna Trust,Bhubaneswar,Dal Rice,100,1
-Helping Hands,Bhubaneswar,Any,75,1
-Food Relief Network,Bhubaneswar,Rice,150,0
+ngo_name,location,latitude,longitude,food_types,max_servings,pickup_available,avg_pickup_minutes
+Hope Foundation,Bhubaneswar,20.2961,85.8245,Chicken Rice,50,1,30
+Annapurna Trust,Bhubaneswar,20.2850,85.8310,Dal Rice,100,1,45
+Helping Hands,Bhubaneswar,20.3000,85.8200,Any,75,1,25
+Food Relief Network,Bhubaneswar,20.2700,85.8400,Rice,150,0,40

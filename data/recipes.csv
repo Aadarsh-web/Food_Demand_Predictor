@@ -1,26 +1,122 @@
-menu,ingredient,quantity_per_100
-Chicken Rice,Rice,7.5
-Chicken Rice,Chicken,4.5
-Chicken Rice,Onion,1.5
-Chicken Rice,Tomato,1.2
-Chicken Rice,Oil,0.8
-Dal Rice,Rice,7.5
-Dal Rice,Dal,2.5
-Dal Rice,Onion,1.2
-Dal Rice,Tomato,1.0
-Dal Rice,Oil,0.7
-Egg Curry Rice,Rice,7.5
-Egg Curry Rice,Eggs,100
-Egg Curry Rice,Onion,1.5
-Egg Curry Rice,Tomato,1.2
-Egg Curry Rice,Oil,0.8
-Paneer Rice,Rice,7.5
-Paneer Rice,Paneer,4.5
-Paneer Rice,Onion,1.5
-Paneer Rice,Tomato,1.2
-Paneer Rice,Oil,0.8
-Rajma Rice,Rice,7.5
-Rajma Rice,Rajma,2.8
-Rajma Rice,Onion,1.2
-Rajma Rice,Tomato,1.0
-Rajma Rice,Oil,0.7
+menu,ingredient,quantity_per_serving,unit
+Chole,Chickpeas,0.035,kg
+Chole,Onion,0.015,kg
+Chole,Tomato,0.012,kg
+Chole,Oil,0.005,L
+Chole,Spices,0.003,kg
+Bhature,Refined Flour,0.070,kg
+Bhature,Oil,0.010,L
+Bhature,Yogurt,0.010,kg
+Bhature,Water,0.025,L
+Idli,Rice,0.045,kg
+Idli,Urad Dal,0.020,kg
+Idli,Water,0.040,L
+Idli,Oil,0.002,L
+Bada,Urad Dal,0.050,kg
+Bada,Oil,0.012,L
+Bada,Onion,0.008,kg
+Bada,Spices,0.003,kg
+Ghuguni,Dry Peas,0.045,kg
+Ghuguni,Onion,0.015,kg
+Ghuguni,Tomato,0.010,kg
+Ghuguni,Oil,0.005,L
+Ghuguni,Spices,0.003,kg
+Masala Upma,Semolina,0.055,kg
+Masala Upma,Onion,0.010,kg
+Masala Upma,Vegetables,0.015,kg
+Masala Upma,Oil,0.005,L
+Masala Upma,Spices,0.002,kg
+Poha,Poha,0.060,kg
+Poha,Onion,0.012,kg
+Poha,Potato,0.010,kg
+Poha,Oil,0.005,L
+Poha,Peanuts,0.008,kg
+Dry Ghuguni,Dry Peas,0.050,kg
+Dry Ghuguni,Onion,0.012,kg
+Dry Ghuguni,Oil,0.005,L
+Dry Ghuguni,Spices,0.003,kg
+Onion Masala Dosa,Rice,0.055,kg
+Onion Masala Dosa,Urad Dal,0.020,kg
+Onion Masala Dosa,Potato,0.025,kg
+Onion Masala Dosa,Onion,0.010,kg
+Onion Masala Dosa,Oil,0.005,L
+Sambar,Toor Dal,0.030,kg
+Sambar,Vegetables,0.025,kg
+Sambar,Onion,0.010,kg
+Sambar,Tomato,0.010,kg
+Sambar,Oil,0.003,L
+Sambar,Spices,0.003,kg
+Dahi Vada,Urad Dal,0.045,kg
+Dahi Vada,Dahi,0.040,kg
+Dahi Vada,Oil,0.010,L
+Dahi Vada,Spices,0.003,kg
+Aloo Dum,Potato,0.070,kg
+Aloo Dum,Onion,0.012,kg
+Aloo Dum,Tomato,0.010,kg
+Aloo Dum,Oil,0.006,L
+Aloo Dum,Spices,0.003,kg
+Vada Pav,Pav,1,piece
+Vada Pav,Potato,0.070,kg
+Vada Pav,Gram Flour,0.015,kg
+Vada Pav,Oil,0.010,L
+Vada Pav,Chutney,0.010,kg
+Aloo Chop,Potato,0.060,kg
+Aloo Chop,Gram Flour,0.020,kg
+Aloo Chop,Oil,0.012,L
+Aloo Chop,Onion,0.008,kg
+Aloo Samosa,Potato,0.045,kg
+Aloo Samosa,Refined Flour,0.030,kg
+Aloo Samosa,Oil,0.012,L
+Aloo Samosa,Peas,0.010,kg
+Papdi Chaat,Flour,0.030,kg
+Papdi Chaat,Potato,0.025,kg
+Papdi Chaat,Chickpeas,0.015,kg
+Papdi Chaat,Dahi,0.020,kg
+Papdi Chaat,Chutney,0.010,kg
+Fried Chilli,Green Chilli,0.030,kg
+Fried Chilli,Gram Flour,0.015,kg
+Fried Chilli,Oil,0.012,L
+Boiled Egg,Egg,1,piece
+Boiled Egg,Salt,0.001,kg
+Tea,Milk,0.050,L
+Tea,Tea Leaves,0.002,kg
+Tea,Sugar,0.008,kg
+Tea,Water,0.100,L
+Coffee,Milk,0.050,L
+Coffee,Coffee Powder,0.003,kg
+Coffee,Sugar,0.008,kg
+Coffee,Water,0.100,L
+Dahi,Milk,0.100,L
+Dahi,Culture,0.001,kg
+Milkshake,Milk,0.100,L
+Milkshake,Sugar,0.010,kg
+Milkshake,Fruit,0.030,kg
+Banana,Banana,1,piece
+Onion,Onion,1,piece
+Coconut Chutney,Coconut,0.035,kg
+Coconut Chutney,Roasted Gram,0.015,kg
+Coconut Chutney,Green Chilli,0.003,kg
+Coconut Chutney,Water,0.030,L
+Groundnut Chutney,Groundnut,0.035,kg
+Groundnut Chutney,Roasted Gram,0.015,kg
+Groundnut Chutney,Green Chilli,0.003,kg
+Groundnut Chutney,Water,0.030,L
+Pudina Chutney,Mint,0.025,kg
+Pudina Chutney,Coriander,0.025,kg
+Pudina Chutney,Green Chilli,0.005,kg
+Pudina Chutney,Water,0.040,L
+Bread,Wheat Flour,0.060,kg
+Bread,Yeast,0.002,kg
+Bread,Sugar,0.003,kg
+Bread,Oil,0.003,L
+Pav,Wheat Flour,0.060,kg
+Pav,Yeast,0.002,kg
+Pav,Sugar,0.003,kg
+Pav,Oil,0.003,L
+Cream Bun,Refined Flour,0.055,kg
+Cream Bun,Sugar,0.008,kg
+Cream Bun,Cream,0.020,kg
+Cream Bun,Oil,0.005,L
+Sev,Gram Flour,0.070,kg
+Sev,Oil,0.020,L
+Sev,Spices,0.003,kg

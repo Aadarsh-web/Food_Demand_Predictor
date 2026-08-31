@@ -1,103 +1,148 @@
 import pandas as pd
 import joblib
 
-from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import OneHotEncoder
-from sklearn.pipeline import Pipeline
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_absolute_error
+
 from xgboost import XGBRegressor
 
 
-DATA_PATH = "data/meal_data.csv"
-MODEL_PATH = "models/food_demand_xgb.pkl"
+# =========================================================
+# LOAD DATA
+# =========================================================
+
+df = pd.read_csv("data/meal_data.csv")
 
 
-def train_model():
+# =========================================================
+# FEATURES
+# =========================================================
 
-    # Load the latest historical data.
-    df = pd.read_csv(DATA_PATH)
+features = [
+    "day_of_week",
+    "month",
+    "season",
+    "attendance",
+    "meal_type",
+    "menu",
+    "rain",
+    "temperature",
+    "holiday",
+    "exam",
+    "campus_event",
+    "previous_consumption",
+    "previous_surplus"
+]
 
-    # Separate inputs from the target.
-    X = df.drop(
-        columns=["meals_consumed", "date"]
-    )
+target = "meals_consumed"
 
-    y = df["meals_consumed"]
 
-    # Features containing text.
-    categorical_features = [
+X = df[features].copy()
+y = df[target]
+
+
+# =========================================================
+# ENCODE CATEGORICAL FEATURES
+# =========================================================
+
+X = pd.get_dummies(
+    X,
+    columns=[
+        "season",
         "meal_type",
         "menu"
     ]
-
-    # Features containing numbers.
-    numerical_features = [
-        "attendance",
-        "day_of_week",
-        "rain",
-        "temperature",
-        "holiday",
-        "exam",
-        "campus_event",
-        "previous_consumption",
-        "previous_surplus"
-    ]
-
-    # Convert categorical features into numerical representation.
-    preprocessor = ColumnTransformer(
-        transformers=[
-            (
-                "categorical",
-                OneHotEncoder(
-                    handle_unknown="ignore"
-                ),
-                categorical_features
-            )
-        ],
-        remainder="passthrough"
-    )
-
-    # Create the XGBoost model.
-    model = Pipeline([
-        (
-            "preprocessor",
-            preprocessor
-        ),
-        (
-            "regressor",
-            XGBRegressor(
-                n_estimators=300,
-                max_depth=5,
-                learning_rate=0.05,
-                subsample=0.8,
-                colsample_bytree=0.8,
-                objective="reg:squarederror",
-                eval_metric="mae",
-                random_state=42,
-                n_jobs=-1
-            )
-        )
-    ])
-
-    # Train on the complete available dataset.
-    model.fit(X, y)
-
-    # Save the trained XGBoost model.
-    joblib.dump(
-        model,
-        MODEL_PATH
-    )
-
-    print(
-        f"XGBoost trained using {len(df)} records."
-    )
-
-    print(
-        "Model saved to:",
-        MODEL_PATH
-    )
-
-    return model
+)
 
 
-if __name__ == "__main__":
-    train_model()
+# =========================================================
+# TRAIN / TEST SPLIT
+# =========================================================
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.20,
+    random_state=42
+)
+
+
+# =========================================================
+# XGBOOST
+# =========================================================
+
+model = XGBRegressor(
+    n_estimators=500,
+    max_depth=6,
+    learning_rate=0.05,
+    subsample=0.85,
+    colsample_bytree=0.85,
+    objective="reg:squarederror",
+    random_state=42
+)
+
+
+# =========================================================
+# TRAIN
+# =========================================================
+
+model.fit(
+    X_train,
+    y_train
+)
+
+
+# =========================================================
+# EVALUATE
+# =========================================================
+
+predictions = model.predict(
+    X_test
+)
+
+mae = mean_absolute_error(
+    y_test,
+    predictions
+)
+
+
+print("\n========================================")
+print("        ANNADATA XGBOOST MODEL")
+print("========================================")
+
+print(
+    f"\nTraining records: {len(X_train)}"
+)
+
+print(
+    f"Testing records: {len(X_test)}"
+)
+
+print(
+    f"Features used: {len(X.columns)}"
+)
+
+print(
+    f"MAE: {mae:.2f} meals"
+)
+
+
+# =========================================================
+# SAVE MODEL + FEATURE COLUMNS
+# =========================================================
+
+model_package = {
+    "model": model,
+    "features": list(X.columns)
+}
+
+joblib.dump(
+    model_package,
+    "models/food_demand_xgb.pkl"
+)
+
+
+print(
+    "\nModel saved to "
+    "models/food_demand_xgb.pkl"
+)
