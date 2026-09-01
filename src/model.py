@@ -1,17 +1,21 @@
 import pandas as pd
 import joblib
+import numpy as np
 
-from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error
 
-from xgboost import XGBRegressor
+import xgboost as xgb
 
 
 # =========================================================
 # LOAD DATA
 # =========================================================
 
-df = pd.read_csv("data/meal_data.csv")
+df = pd.read_csv("../data/meal_data.csv")
+
+df["date"] = pd.to_datetime(df["date"])
+
+df = df.sort_values("date").reset_index(drop=True)
 
 
 # =========================================================
@@ -56,29 +60,51 @@ X = pd.get_dummies(
 
 
 # =========================================================
-# TRAIN / TEST SPLIT
+# TIME-BASED TRAIN / TEST SPLIT
 # =========================================================
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X,
-    y,
-    test_size=0.20,
-    random_state=42
+split_date = pd.Timestamp("2025-01-01")
+
+train_mask = df["date"] < split_date
+test_mask = df["date"] >= split_date
+
+X_train = X.loc[train_mask]
+X_test = X.loc[test_mask]
+
+y_train = y.loc[train_mask]
+y_test = y.loc[test_mask]
+
+
+# =========================================================
+# XGBOOST 95% QUANTILE MODEL
+# =========================================================
+
+model_params = {
+    "objective": "reg:quantileerror",
+    "quantile_alpha": 0.95,
+
+    "max_depth": 6,
+    "learning_rate": 0.05,
+
+    "subsample": 0.85,
+    "colsample_bytree": 0.85,
+
+    "seed": 42
+}
+
+
+# =========================================================
+# XGBOOST DATA MATRICES
+# =========================================================
+
+dtrain = xgb.DMatrix(
+    X_train,
+    label=y_train
 )
 
-
-# =========================================================
-# XGBOOST
-# =========================================================
-
-model = XGBRegressor(
-    n_estimators=500,
-    max_depth=6,
-    learning_rate=0.05,
-    subsample=0.85,
-    colsample_bytree=0.85,
-    objective="reg:squarederror",
-    random_state=42
+dtest = xgb.DMatrix(
+    X_test,
+    label=y_test
 )
 
 
@@ -86,9 +112,10 @@ model = XGBRegressor(
 # TRAIN
 # =========================================================
 
-model.fit(
-    X_train,
-    y_train
+model = xgb.train(
+    params=model_params,
+    dtrain=dtrain,
+    num_boost_round=500
 )
 
 
@@ -97,7 +124,7 @@ model.fit(
 # =========================================================
 
 predictions = model.predict(
-    X_test
+    dtest
 )
 
 mae = mean_absolute_error(
@@ -123,6 +150,10 @@ print(
 )
 
 print(
+    f"Quantile: 95%"
+)
+
+print(
     f"MAE: {mae:.2f} meals"
 )
 
@@ -133,16 +164,19 @@ print(
 
 model_package = {
     "model": model,
-    "features": list(X.columns)
+    "features": list(X.columns),
+    "model_type": "xgboost_quantile",
+    "quantile": 0.95
 }
+
 
 joblib.dump(
     model_package,
-    "models/food_demand_xgb.pkl"
+    "../models/food_demand_xgb.pkl"
 )
 
 
 print(
     "\nModel saved to "
-    "models/food_demand_xgb.pkl"
+    "../models/food_demand_xgb.pkl"
 )

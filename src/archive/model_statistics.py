@@ -1,5 +1,8 @@
 import pandas as pd
+import joblib
 from sklearn.metrics import mean_absolute_error
+
+import xgboost as xgb
 from xgboost import XGBRegressor
 
 
@@ -10,7 +13,6 @@ from xgboost import XGBRegressor
 df = pd.read_csv("../data/meal_data.csv")
 
 df["date"] = pd.to_datetime(df["date"])
-
 df = df.sort_values("date").reset_index(drop=True)
 
 
@@ -36,7 +38,6 @@ features = [
 
 target = "meals_consumed"
 
-
 X = df[features].copy()
 y = df[target]
 
@@ -47,16 +48,12 @@ y = df[target]
 
 X = pd.get_dummies(
     X,
-    columns=[
-        "season",
-        "meal_type",
-        "menu"
-    ]
+    columns=["season", "meal_type", "menu"]
 )
 
 
 # =========================================================
-# CHRONOLOGICAL SPLIT
+# TIME-BASED SPLIT
 # =========================================================
 
 split_date = pd.Timestamp("2025-01-01")
@@ -72,37 +69,35 @@ y_test = y.loc[test_mask]
 
 
 # =========================================================
-# TRAIN XGBOOST
+# LOAD TRAINED MODEL
 # =========================================================
 
-model = XGBRegressor(
-    n_estimators=500,
-    max_depth=6,
-    learning_rate=0.05,
-    subsample=0.85,
-    colsample_bytree=0.85,
-    objective="reg:squarederror",
-    random_state=42
+model_package = joblib.load(
+    "../models/food_demand_xgb.pkl"
 )
 
+model = model_package["model"]
 
-model.fit(
-    X_train,
-    y_train
+
+# =========================================================
+# PREDICTIONS
+# =========================================================
+
+dtest = xgb.DMatrix(X_test)
+
+predictions = model.predict(dtest)
+
+predictions = pd.Series(
+    predictions,
+    index=y_test.index
 )
 
-
-# =========================================================
-# PREDICT
-# =========================================================
-
-predictions = model.predict(
-    X_test
-)
+errors = predictions - y_test
+absolute_errors = errors.abs()
 
 
 # =========================================================
-# EVALUATE
+# STATISTICS
 # =========================================================
 
 mae = mean_absolute_error(
@@ -110,37 +105,86 @@ mae = mean_absolute_error(
     predictions
 )
 
+maximum_error = absolute_errors.max()
+
+maximum_underprediction = errors.min()
+
+maximum_overprediction = errors.max()
+
+underpredictions = (errors < 0).sum()
+
+overpredictions = (errors > 0).sum()
+
+exact_predictions = (errors == 0).sum()
+
+total_predictions = len(errors)
+
+underprediction_rate = (
+    underpredictions / total_predictions
+) * 100
+
+overprediction_rate = (
+    overpredictions / total_predictions
+) * 100
+
+exact_prediction_rate = (
+    exact_predictions / total_predictions
+) * 100
+
+average_error = errors.mean()
+
+
+# =========================================================
+# DISPLAY
+# =========================================================
 
 print("\n========================================")
-print("     ANNADATA TIME-BASED EVALUATION")
+print("       ANNADATA MODEL STATISTICS")
 print("========================================")
 
 print(
-    f"\nTraining period: "
-    f"{df.loc[train_mask, 'date'].min().date()} "
-    f"→ "
-    f"{df.loc[train_mask, 'date'].max().date()}"
+    f"\nTest records: {total_predictions}"
 )
 
 print(
-    f"Testing period: "
-    f"{df.loc[test_mask, 'date'].min().date()} "
-    f"→ "
-    f"{df.loc[test_mask, 'date'].max().date()}"
+    f"MAE: {mae:.2f} meals"
 )
 
 print(
-    f"\nTraining records: {len(X_train)}"
+    f"Average error: {average_error:.2f} meals"
 )
 
 print(
-    f"Testing records: {len(X_test)}"
+    f"Maximum absolute error: "
+    f"{maximum_error:.0f} meals"
 )
 
 print(
-    f"Features used: {len(X.columns)}"
+    f"Worst underprediction: "
+    f"{maximum_underprediction:.0f} meals"
 )
 
 print(
-    f"\nTime-based MAE: {mae:.2f} meals"
+    f"Worst overprediction: "
+    f"+{maximum_overprediction:.0f} meals"
+)
+
+print("\n--- ERROR DIRECTION ---")
+
+print(
+    f"Underpredictions: "
+    f"{underpredictions} "
+    f"({underprediction_rate:.2f}%)"
+)
+
+print(
+    f"Overpredictions: "
+    f"{overpredictions} "
+    f"({overprediction_rate:.2f}%)"
+)
+
+print(
+    f"Exact predictions: "
+    f"{exact_predictions} "
+    f"({exact_prediction_rate:.2f}%)"
 )

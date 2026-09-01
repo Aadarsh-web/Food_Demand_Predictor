@@ -1,5 +1,5 @@
 import pandas as pd
-from sklearn.metrics import mean_absolute_error
+import numpy as np
 from xgboost import XGBRegressor
 
 
@@ -10,7 +10,6 @@ from xgboost import XGBRegressor
 df = pd.read_csv("../data/meal_data.csv")
 
 df["date"] = pd.to_datetime(df["date"])
-
 df = df.sort_values("date").reset_index(drop=True)
 
 
@@ -34,29 +33,17 @@ features = [
     "previous_surplus"
 ]
 
-target = "meals_consumed"
-
-
 X = df[features].copy()
-y = df[target]
-
-
-# =========================================================
-# ENCODE CATEGORICAL FEATURES
-# =========================================================
+y = df["meals_consumed"]
 
 X = pd.get_dummies(
     X,
-    columns=[
-        "season",
-        "meal_type",
-        "menu"
-    ]
+    columns=["season", "meal_type", "menu"]
 )
 
 
 # =========================================================
-# CHRONOLOGICAL SPLIT
+# TIME SPLIT
 # =========================================================
 
 split_date = pd.Timestamp("2025-01-01")
@@ -72,7 +59,7 @@ y_test = y.loc[test_mask]
 
 
 # =========================================================
-# TRAIN XGBOOST
+# TRAIN 95% QUANTILE MODEL
 # =========================================================
 
 model = XGBRegressor(
@@ -81,66 +68,76 @@ model = XGBRegressor(
     learning_rate=0.05,
     subsample=0.85,
     colsample_bytree=0.85,
-    objective="reg:squarederror",
+    objective="reg:quantileerror",
+    quantile_alpha=0.95,
     random_state=42
 )
 
+model.fit(X_train, y_train)
 
-model.fit(
-    X_train,
-    y_train
-)
-
-
-# =========================================================
-# PREDICT
-# =========================================================
-
-predictions = model.predict(
-    X_test
-)
+predictions = model.predict(X_test)
+actual = y_test.to_numpy()
 
 
 # =========================================================
-# EVALUATE
+# CALIBRATION EXPERIMENT
 # =========================================================
 
-mae = mean_absolute_error(
-    y_test,
-    predictions
-)
-
+corrections = [0, 5, 10, 15, 20, 25, 30, 35, 40]
 
 print("\n========================================")
-print("     ANNADATA TIME-BASED EVALUATION")
+print("       ANNADATA CALIBRATION TEST")
 print("========================================")
 
 print(
-    f"\nTraining period: "
-    f"{df.loc[train_mask, 'date'].min().date()} "
-    f"→ "
-    f"{df.loc[train_mask, 'date'].max().date()}"
+    "\nCorrection | Under % | Worst Shortage | "
+    "Avg Shortage | Avg Surplus | MAE"
 )
 
-print(
-    f"Testing period: "
-    f"{df.loc[test_mask, 'date'].min().date()} "
-    f"→ "
-    f"{df.loc[test_mask, 'date'].max().date()}"
-)
+print("-" * 78)
 
-print(
-    f"\nTraining records: {len(X_train)}"
-)
 
-print(
-    f"Testing records: {len(X_test)}"
-)
+for correction in corrections:
 
-print(
-    f"Features used: {len(X.columns)}"
-)
+    calibrated = predictions - correction
 
-print(
-    f"\nTime-based MAE: {mae:.2f} meals"
-)
+    errors = calibrated - actual
+
+    under = errors < 0
+    over = errors > 0
+
+    under_count = under.sum()
+    over_count = over.sum()
+
+    under_rate = (
+        under_count / len(errors)
+    ) * 100
+
+    worst_shortage = (
+        errors[under].min()
+        if under_count > 0
+        else 0
+    )
+
+    average_shortage = (
+        np.abs(errors[under]).mean()
+        if under_count > 0
+        else 0
+    )
+
+    average_surplus = (
+        errors[over].mean()
+        if over_count > 0
+        else 0
+    )
+
+    mae = np.abs(errors).mean()
+
+    print(
+        f"{correction:>10} | "
+        f"{under_rate:>7.2f}% | "
+        f"{worst_shortage:>14.0f} | "
+        f"{average_shortage:>12.2f} | "
+        f"{average_surplus:>11.2f} | "
+        f"{mae:>5.2f}"
+    )

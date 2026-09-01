@@ -2,25 +2,25 @@ import pandas as pd
 import numpy as np
 import joblib
 import json
-
+import xgboost as xgb
 
 # =========================================================
 # LOAD ALL REQUIRED DATA
 # =========================================================
 
 model_package = joblib.load(
-    "models/food_demand_xgb.pkl"
+    "../models/food_demand_xgb.pkl"
 )
 
 model = model_package["model"]
 model_features = model_package["features"]
 
-recipes = pd.read_csv("data/recipes.csv")
-prices = pd.read_csv("data/ingredient_prices.csv")
-ngos = pd.read_csv("data/ngos.csv")
+recipes = pd.read_csv("../data/recipes.csv")
+prices = pd.read_csv("../data/ingredient_prices.csv")
+ngos = pd.read_csv("../data/ngos.csv")
 
 # Load food-specific safety rules from the AnnaData Excel file.
-safety_data = pd.read_excel("data/ANANDATA.xlsx")
+safety_data = pd.read_excel("../data/ANANDATA.xlsx")
 
 # Clean column names.
 safety_data.columns = safety_data.columns.str.strip()
@@ -109,8 +109,12 @@ def predict_demand(
         fill_value=0
     )
 
-    prediction = model.predict(
+    prediction_data = xgb.DMatrix(
         input_data
+    )
+
+    prediction = model.predict(
+        prediction_data
     )[0]
 
     prediction = max(
@@ -851,7 +855,7 @@ def run_annadata(
 if __name__ == "__main__":
 
     # Load today's meal information.
-    with open("data/today_meal.json", "r") as file:
+    with open("../data/today_meal.json", "r") as file:
         meal_data = json.load(file)
 
     # Run the complete AnnaData engine.
@@ -927,44 +931,48 @@ if __name__ == "__main__":
 
     if "food" in result["safety"]:
 
-     print("Food:", result["safety"]["food"])
-
-     print(
-        "Condition:",
-        result["safety"]["condition"]
-     )
-
-     print(
-        "Temperature Rule:",
-        result["safety"]["temperature_rule"]
-     )
-
-     print(
-        "Maximum Storage Time:",
-        result["safety"]["maximum_storage_time"]
-     )
-
-     print(
-        "Allergens:",
-        result["safety"]["allergens"]
-     )
-
-     print(
-        "Instructions:",
-        result["safety"]["instructions"]
-     )
-
-    print("\n--- NGO MATCHING ---")
-if result["ngo_matches"]:
-
-    for ngo in result["ngo_matches"]:
-
         print(
-            f"{ngo['ngo']} → "
-            f"{ngo['allocated_servings']} servings "
-            f"({ngo['pickup_minutes']} min pickup)"
+            "Food:",
+            result["safety"]["food"]
         )
 
-else:
+        print(
+            "Condition:",
+            result["safety"]["condition"]
+        )
 
-    print("No NGO allocation available.")
+        print(
+            "Temperature Rule:",
+            result["safety"]["temperature_rule"]
+        )
+
+        print(
+            "Maximum Storage Time:",
+            result["safety"]["maximum_storage_time"]
+        )
+
+        print(
+            "Allergens:",
+            result["safety"]["allergens"]
+        )
+
+        print(
+            "Instructions:",
+            result["safety"]["instructions"]
+        )
+
+    print("\n--- NGO MATCHING ---")
+
+    if result["ngo_matches"]:
+
+        for ngo in result["ngo_matches"]:
+
+            print(
+                f"{ngo['ngo']} → "
+                f"{ngo['allocated_servings']} servings "
+                f"({ngo['pickup_minutes']} min pickup)"
+            )
+
+    else:
+
+        print("No NGO allocation available.")

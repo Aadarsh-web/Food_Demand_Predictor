@@ -732,7 +732,7 @@ df = df.sort_values(
 # =========================================================
 
 df.to_csv(
-    "data/meal_data.csv",
+    "../data/meal_data.csv",
     index=False
 )
 

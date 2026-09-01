@@ -2,7 +2,7 @@ import pandas as pd
 from model import train_model
 
 
-DATA_PATH = "data/meal_data.csv"
+DATA_PATH = "../data/meal_data.csv"
 
 
 def record_actual_result(
